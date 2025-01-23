@@ -1,0 +1,7 @@
+$list = 1 2 3 7;
+for $num in $list do (
+    print('$num = ' $num);
+    $nums = 1...$num;
+    print('$nums = ' $nums);
+    for $x in $nums do (print('$x = ' $x)) 
+)
