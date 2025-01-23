@@ -1,0 +1,12 @@
+$chord1 = 6000 6400 6700;
+$interval = -200;
+$chord2 = $chord1 + $interval;
+$onset = 0;
+for $chord in [$chord1] [$chord2] do (
+    $chord = flat($chord);
+    for $pitch in $chord do (
+        ezsampler($pitch).transcribe($onset) 
+    );
+    $onset += 1000
+);
+render(@play 1)

@@ -1,0 +1,7 @@
+$pitch = 6200;
+$interval = 400;
+## 
+$pitch2 = $pitch + $interval;
+ezsampler(@pitch $pitch).inspect('mybuffer').transcribe();
+ezsampler(@pitch $pitch2).transcribe(1000);
+render(@play 1)

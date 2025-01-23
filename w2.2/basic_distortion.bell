@@ -1,0 +1,14 @@
+$chord = 6000 6400 6700 7200;
+$axis = 6000;
+addmarker(0, 'original');
+for $mc in $chord do (
+    ezsampler($mc).transcribe() 
+);
+$intervals = $chord - $axis;
+$intervals *= 0.9;
+$chord = $axis - $intervals;
+addmarker(1000, 'distorted');
+for $mc in $chord do (
+    ezsampler($mc).transcribe(1000) 
+);
+render(@play 1)

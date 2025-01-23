@@ -1,0 +1,8 @@
+$pitch1 = 6000;
+$pitch2 = 6800;
+$interval = abs($pitch1 - $pitch2);
+$pitch2 = $pitch1 - $interval;
+for $pitch in $pitch1 $pitch2 do (
+    ezsampler($pitch).transcribe() 
+);
+render(@play 1)

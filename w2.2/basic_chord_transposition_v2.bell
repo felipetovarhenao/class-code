@@ -1,0 +1,23 @@
+$chord1 = 6000 6400 6700;
+$interval1 = 500;
+$interval2 = 700;
+$chord2 = $chord1 + $interval1;
+$chord3 = $chord1 + $interval2;
+$onset = 0;
+for $pitch in $chord1 do (
+    ezsampler($pitch).transcribe($onset) 
+);
+$onset += 1000;
+for $pitch in $chord2 do (
+    ezsampler($pitch).transcribe($onset) 
+);
+$onset += 1000;
+for $pitch in $chord3 do (
+    ezsampler($pitch).transcribe($onset) 
+);
+$onset += 1000;
+for $pitch in $chord1 do (
+    ezsampler($pitch).transcribe($onset) 
+);
+$onset += 1000;
+render(@play 1)
