@@ -1,0 +1,19 @@
+## fundamental frequency
+$fzero = 55.0;
+## list of integer multiples from 1 to 16
+$harmonics = 1...16;
+## frequencies of harmonic series
+$harmseries = $fzero * $harmonics;
+## convert harmonic series to midicents
+$pitches = f2mc($harmseries);
+## initializing onset variable
+$onset = 0;
+## iterating through pitches 
+for $mc in $pitches do (
+    ## create buffer with pitch of harmonic
+    ezsampler($mc).transcribe($onset);
+    ## increase onset variable
+    $onset += 200
+);
+## trigger audio rendering
+render(@play 1)

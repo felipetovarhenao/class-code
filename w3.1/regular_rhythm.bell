@@ -1,0 +1,10 @@
+$durs = (400 200) :* 7;
+$onset = 0;
+$onsets = $onset;
+for $dur in $durs do (
+    ezsampler().transcribe($onset);
+    $onset += $dur;
+    $onsets _= $onset
+);
+print($onsets);
+render(@play 1)

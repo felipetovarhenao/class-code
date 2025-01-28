@@ -1,0 +1,5 @@
+$x = 0...10;
+$dx = x2dx($x);
+$x = dx2x($dx);
+print('dx: ' $dx);
+print('x: ' $x)

@@ -1,0 +1,31 @@
+## fundamental frequency
+$fzero = 800.0;
+## list of integer multiples from 1 to 16
+$harmonics = 1...16;
+## frequencies of harmonic series
+$harmseries = $fzero * $harmonics;
+## convert harmonic series to midicents
+$pitches = f2mc($harmseries);
+## pitches to invervals
+$intervals = x2dx($pitches);
+## define distortion factor
+$distortion = 1; ## no distortion
+$distortion = 1.2; ## stretching
+$distortion = 0.9; ## compression
+$distortion = 0; ## unison
+$distortion = -1; ## inversion around fundamental
+$distortion = -1.1; ## inversion + stretching
+$distortion = -0.9; ## inversion + compression
+## apply distortion to intervals
+$intervals *= $distortion;
+## convert distorted intervals to pitches
+## $pitches = dx2x(@dx $intervals @st $pitches:1);
+$pitches = dx2x(@st $pitches:1 @dx $intervals);
+## initialize onset
+$onset = 0;
+## ## transcribe all pitches
+for $mc in $pitches do (
+    ezsampler($mc).transcribe($onset);
+    $onset += 200
+);
+render(@play 1)

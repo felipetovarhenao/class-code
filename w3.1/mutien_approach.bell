@@ -1,0 +1,9 @@
+$harmseries = (1...16) * 55;
+$harmseries *= (3/2);
+$harmseries = f2mc($harmseries);
+$onset = 0;
+for $mc in $harmseries do (
+    ezsampler($mc).transcribe($onset);
+    $onset += 200
+);
+render(@play 1)

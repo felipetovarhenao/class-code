@@ -1,0 +1,4 @@
+$chord = 6000 6400 6700;
+$intervals = $chord.x2dx();
+$chord = dx2x($intervals @st 6000);
+print($chord)

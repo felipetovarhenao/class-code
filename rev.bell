@@ -1,0 +1,8 @@
+$chord = c4 eb4 g4;
+$third = $chord:2 - $chord:1;
+if $third == 400 then (
+    $chord _= b4
+) else if $third == 300 then (
+    $chord _= bb4
+);
+print($chord)

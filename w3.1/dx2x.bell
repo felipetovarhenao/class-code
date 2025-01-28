@@ -1,0 +1,6 @@
+$durations = (400 200) :* 7;
+$onsets = dx2x($durations);
+for $onset in $onsets do (
+    ezsampler().transcribe($onset) 
+);
+render(@play 1)

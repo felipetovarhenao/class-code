@@ -1,0 +1,10 @@
+$chord = 6000 6400 6700;
+$root = 6200;
+$distortion = 1.33;
+$intervals = x2dx($chord);
+$intervals *= $distortion;
+$chord = dx2x($intervals @st $root);
+for $mc in $chord do (
+    ezsampler($mc).transcribe() 
+);
+render(@play 1)
