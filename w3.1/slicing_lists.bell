@@ -1,0 +1,8 @@
+$original = (1...10) * 100;
+$mid = 5;
+$shorter = for $i in 1...$mid collect $original:$i;
+print($shorter);
+$shorter = $original:[1...$mid];
+print($shorter);
+$shorter = left($original, $mid);
+print($shorter)
