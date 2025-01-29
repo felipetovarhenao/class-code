@@ -1,0 +1,3 @@
+$scale = 500 * (0...11) + 3600;
+for $mc $mci in $scale do ezsampler($mc).transcribe(($mci - 1) * 150);
+render(@play 1)

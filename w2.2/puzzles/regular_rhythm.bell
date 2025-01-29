@@ -1,0 +1,2 @@
+for $t in dx2x((400 200) :* 7) do ezsampler().transcribe($t);
+render(@play 1)
