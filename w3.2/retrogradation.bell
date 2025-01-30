@@ -1,0 +1,10 @@
+$mel = c5 e5 g5 b5 d6 f#6;
+$mel = $mel $mel.rev().left(-1).right(1);
+## $mel = $mel $mel.left(-1).rev().left(-1); ## option 2
+$mel = $mel :* 5;
+$onset = 0;
+for $mc in $mel do (
+    ezsampler($mc).transcribe($onset);
+    $onset += 120
+);
+render(@play 1)

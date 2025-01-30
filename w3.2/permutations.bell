@@ -1,0 +1,11 @@
+$perm = perm(1 2 3 4);
+$perm = scramble($perm);
+$onset = 0;
+for $p in $perm do (
+    for $i in flat($p) do (
+        $mc = $i * 25 + 6000;
+        ezsampler($mc).transcribe($onset);
+        $onset += 120
+    ) 
+);
+render(@play 1)

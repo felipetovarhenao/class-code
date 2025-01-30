@@ -1,0 +1,18 @@
+## random integers between 1 and 10 (inclusive)
+$x = random(1, 10);
+print($x);
+## random floating point numbers between 1 and 10
+$x = rand(1, 10) print($x);
+## shuffle elements in a list
+$x = 1...10;
+$scrambled = $x.scramble();
+print($scrambled);
+## random selection/choice
+$x = 'a' 'b' 'c' 'd' 'e';
+$choice = choose($x);
+print($choice);
+## unique random number
+## initialize urn generator with id 0
+initurn(@size 10 @id 0);
+## generate unique random numbers 20 times
+for $i in 1...20 do print(urn(@id 0))

@@ -1,0 +1,10 @@
+$mel = 6000 6160 6750 6400;
+$onset = 0;
+for $rotation in 0...length($mel) do (
+    for $mc in $mel.rot($rotation) do (
+        ezsampler($mc @duration 100).transcribe($onset);
+        $onset += 100
+    );
+    $onset += 600
+);
+render(@play 1)

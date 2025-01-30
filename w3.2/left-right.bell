@@ -1,0 +1,5 @@
+$x = 'a' 'b' 'c' 'e' 'f' 'g' 'h';
+print($x);
+$index = 3;
+$x.left($index).print();
+$x.right($index).print()

@@ -1,0 +1,9 @@
+$scale = (36...96) * 100;
+$scale = print($scale % 1200) + 6000; 
+$t = 0;
+
+for $mc in $scale do (
+    ezsampler($mc).transcribe($t);
+    $t += 120
+);
+render(@play 1)
