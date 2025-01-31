@@ -1,0 +1,2 @@
+for $i in 1...16 do ezsampler(f2mc($i * 55)).transcribe(($i - 1) * 200);
+render(@play 1)
