@@ -1,0 +1,13 @@
+$scale = c5 d5 e5 f5 g5 a5 b5;
+$scaledegrees = 1 2 3 4 5;
+$t = 0;
+for $degreeoffset in 0...2 do (
+    for $degree in $scaledegrees do (
+        $address = $degree + $degreeoffset;
+        $mc = $scale:$address;
+        ezsampler($mc).transcribe($t);
+        $t += 120
+    );
+    $t += 300
+);
+render(@play 1)
