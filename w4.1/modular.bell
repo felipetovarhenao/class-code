@@ -1,0 +1,5 @@
+$size = 7;
+$degrees = 1...$size;
+$degrees -= 1;
+print($degrees);
+print($degrees % $size)

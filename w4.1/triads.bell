@@ -1,0 +1,13 @@
+$scale = c5 d5 e5 f5 g5 a5 b5;
+$size = length($scale);
+$t = 0;
+for $i in 1...$size do (
+    $ids = $i + (0 2 4);
+    $ids = (($ids - 1) % $size) + 1;
+    for $j in $ids do (
+        $pitch = $scale:$j;
+        ezsampler($pitch).transcribe($t) 
+    );
+    $t += 500
+);
+render(@play 1)
