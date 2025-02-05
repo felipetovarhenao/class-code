@@ -1,0 +1,10 @@
+scoreconfig(
+    @voicenames 'voice1' 'voice2' "paul's cat" @clefs 'G' 'F' 'E' 
+);
+ezsampler().transcribe(@voice 2 @pan 0);
+ezsampler().transcribe(
+    @onset 1000
+    @voice 1
+    @pan 1
+);
+render(@play 1)
