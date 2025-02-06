@@ -1,0 +1,9 @@
+$interval = 100;
+$current = 0;
+for $i in 0...20 do (
+    ## if $current > 1200 then $current -= 1200;
+    $current = $current % 1200;
+    if $current == 0 then $current += 1200;
+    print($current);
+    $current += $interval
+)

@@ -1,0 +1,14 @@
+$gainbpf = [0 0 0] [0.5 1 0] [1 0 0.25];
+$pitchbpf = [0 6000 0] [1 7200 0.5];
+envelope($gainbpf).inspect();
+$numnotes = 20;
+$onset = 0;
+for $i in 1...$numnotes do (
+    $time = scale($i, 1, $numnotes, 0, 1);
+    $gain = samplebpf($gainbpf, $time);
+    $pitch = samplebpf($pitchbpf, $time);
+    print('at x position' $time 'in bpf we have' $gain);
+    ezsampler(@pitch $pitch).transcribe($onset @gain $gain);
+    $onset += 100
+);
+render(@play 1)

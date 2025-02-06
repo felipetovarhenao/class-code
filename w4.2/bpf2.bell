@@ -1,0 +1,10 @@
+$numnotes = 50;
+$gainbpf = [0 0 0] [1 1 0.25];
+$onset = 0;
+for $i in 1...$numnotes do (
+    $time = scale($i, 1, $numnotes, 0, 1);
+    $gain = samplebpf($gainbpf, $time);
+    ezsampler().transcribe(@onset $onset @gain $gain);
+    $onset += 100
+);
+render(@play 1)
