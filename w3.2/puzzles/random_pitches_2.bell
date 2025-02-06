@@ -1,0 +1,5 @@
+for $i in 0...25 do (
+    $mc = choose(0 2 4 5 7 9 11) * 100 + 6000;
+    ezsampler($mc).transcribe($i * 200) 
+);
+render(@play 1)
