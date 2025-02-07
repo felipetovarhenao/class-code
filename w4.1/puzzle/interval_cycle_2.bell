@@ -1,0 +1,7 @@
+$cycle = 6000 + ((0...11) * 500) % 1200;
+$onset = 0;
+for $mc in $cycle do (
+    ezsampler($mc).transcribe($onset);
+    $onset += 200
+);
+render(@play 1)
