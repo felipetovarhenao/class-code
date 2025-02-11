@@ -1,0 +1,9 @@
+$events = importmidi('satie.mid');
+$scale = r2pc(1 9/7 11/8 3/2 12/7);
+for $event in $events do (
+    $pitch = $event.getkey('pitch');
+    $pitch += pitchdiff($pitch, $scale);
+    $onset = $event.getkey('onset');
+    ezsampler($pitch).transcribe($onset) 
+);
+render(@play 1)

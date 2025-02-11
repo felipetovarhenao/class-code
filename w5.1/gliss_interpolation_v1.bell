@@ -1,0 +1,12 @@
+$chord1 = c5 e5 g5;
+$chord2 = c5 f5 a5;
+$chord3 = g4 d5 b5;
+$voices = trans(
+    [$chord1] [$chord2] [$chord3] [$chord3] 
+);
+for $v $vi in $voices do (
+    $v = flat($v);
+    $fq = $v.mc2f();
+    cycle($fq @duration 3000).inspect($vi).transcribe(@gain 0.1) 
+);
+render(@play 1)

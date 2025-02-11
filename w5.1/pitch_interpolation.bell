@@ -1,0 +1,9 @@
+$pitch1 = 6000;
+$pitch2 = 7200;
+$t = 0;
+for $x in arithmser(0, 1, null, 10) do (
+    $pitch = (1 - $x) * $pitch1 + $x * $pitch2;
+    ezsampler($pitch).transcribe($t);
+    $t += 120
+);
+render(@play 1)

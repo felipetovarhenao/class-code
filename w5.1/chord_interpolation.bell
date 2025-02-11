@@ -1,0 +1,17 @@
+## define starting and ending chords
+$chord1 = c5 e5 g5 b5;
+$chord2 = c5 f5 a5 bb5;
+## initialize onset variable
+$t = 0;
+## define 10 points from 0 to 1
+$points = arithmser(0, 1., null, 10);
+## iterate through each x point
+for $x in $points do (
+    ## get mix of both chords
+    $chord = (1 - $x) * $chord1 + $x * $chord2;
+    for $mc in $chord do (
+        ezsampler($mc).transcribe($t) 
+    );
+    $t += 500
+);
+render(@play 1)

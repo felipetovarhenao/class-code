@@ -1,0 +1,5 @@
+$alist = 1 2 3;
+$blist = 10 20 30 40;
+for $a in $alist, $b in $blist with @iterationmode 2 do (
+    print($a $b)
+)

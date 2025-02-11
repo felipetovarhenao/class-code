@@ -1,0 +1,10 @@
+$pitchbpf = [0 0 0] [1 1 0];
+$t = 0;
+for $x in 0...80 do (
+    $x = $x.scale(0, 80, 0, 1);
+    $y = $pitchbpf.samplebpf($x);
+    $pitch = $y.scale(0, 1, 6000, 4800);
+    ezsampler($pitch).transcribe($t);
+    $t += rand(0, 3000) 
+);
+render(@play 1)

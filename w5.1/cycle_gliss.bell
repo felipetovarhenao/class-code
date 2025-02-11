@@ -1,0 +1,4 @@
+cycle(
+    [0 400 0] [1 220 0.25] [3 500 0.25] @duration 1000
+).transcribe(@gain 0.1);
+render(@play 1)

@@ -1,0 +1,21 @@
+## define start and end chords
+$chord1 = c5 e5 g5 b5;
+$chord2 = c5 f5 a5 bb5;
+## bpf for mixture
+$mixbpf = [0 0 0] [0.5 1 -0.25] [1 0 0.25];
+## get sampling points for bpf
+$pts = arithmser(0, 1., null, 10);
+$t = 0;
+## iterate through x sampling points
+for $x in $pts do (
+    ## extra step: derive mix (weight) from bpf
+    $mix = $mixbpf.samplebpf($x);
+    ## get weighted mixture of both chords
+    $chord = (1 - $mix) * $chord1 + $mix * $chord2;
+    ## transcribe resulting chord
+    for $mc in $chord do (
+        ezsampler($mc).transcribe($t) 
+    );
+    $t += 500
+);
+render(@play 1)

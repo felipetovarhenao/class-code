@@ -1,0 +1,2 @@
+ezsampler().process(resample(1 2 1 2)).transcribe();
+render(@play 1)

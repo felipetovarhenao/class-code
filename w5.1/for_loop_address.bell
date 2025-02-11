@@ -1,0 +1,6 @@
+$xlist = [[5 5] [4 4]] [[3 3] [2 2]] [1 1];
+$n = 1;
+for $x $address in $xlist with @maxdepth -2 do (
+    ## $y = flat($x, $n);
+    print('value' $x 'address' $address)
+)
