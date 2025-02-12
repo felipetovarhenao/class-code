@@ -1,0 +1,46 @@
+## Define a musical scale (C major with Bb instead of B) in a higher octave
+$scale = sort(
+    c6 d6 e6 f6 g6 a6 bb6 
+);
+## Determine the scale size (number of notes in the scale)
+$scalesize = length($scale);
+## Initialize global time counter
+$t = 0;
+## Set unit duration for each event (in milliseconds)
+$unit = 150;
+## Define a breakpoint function for gain variation over time
+$gainbpf = [0 0.25 0] [1 1 0.25];
+## Compute total number of iterations (double the scale size)
+$N = $scalesize * 2;
+## Iterate through decreasing sequence (reverse order)
+for $n in rev(1...$N) do (
+    ## Randomize panning position
+    $pan = rand();
+    ## Nested iteration to generate melodic events
+    for $i $ii in 1...$n do (
+        ## Normalize index value to range [0,1]
+        $x = scale($ii, 1, $n, 0, 1);
+        ## Sample gain value from breakpoint function
+        $gain = samplebpf($gainbpf, $x);
+        ## Determine the melodic index using a zigzag pattern
+        $index = ($i % 2) * -$i;
+        ## Compute the pitch address within the scale
+        $address = mod($index, $scalesize) + 1;
+        ## Compute octave transpositions in MIDI cents
+        $octave = floor($index / $scalesize) * 1200;
+        ## Select the corresponding pitch from the scale
+        $mc = $scale:$address + $octave;
+        ## Use ezsampler to trigger the note with specified parameters
+        ezsampler($mc).transcribe(
+            $t @gain $gain @pan $pan
+        );
+        ## Increment the global time counter
+        $t += $unit
+    ) 
+);
+## Render the final audio output
+render(@play 1);
+## Export the rendered audio to a file
+export('./section2.wav');
+## Write the total duration of the sequence to a text file
+write($t, './section2.txt')

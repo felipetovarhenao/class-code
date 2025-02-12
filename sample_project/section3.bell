@@ -1,0 +1,51 @@
+## Define a musical scale (C major with Bb instead of B) in a higher octave
+$scale = sort(
+    c5 d5 e5 f5 g5 a5 bb5 
+);
+## Extend the scale to multiple octaves (two additional)
+$scale = for $oct in 0...2 collect $scale + 1200 * $oct;
+## Determine the scale size (total number of notes across octaves)
+$scalesize = length($scale);
+## Set unit duration for each event (in milliseconds)
+$unit = 150;
+## Initialize global time counter
+$t = 0;
+## Define a breakpoint function for gain variation over time
+$gainbpf = [0 0.25 0] [0.5 1 0.25] [1 0.25 -0.25];
+## Overlap factor for sustained notes
+$overlap = 6;
+## Loop through repetition cycles
+for $rep in 1...4 do (
+    ## Nested loop to stagger notes in time
+    for $i in 1...4 do (
+        ## Compute onset offset based on iteration and repetition count
+        $offset = $unit * $i * ($rep + 1);
+        ## Iterate over scale degrees
+        for $mc $mci in $scale do (
+            ## Normalize index value to range [0,1]
+            $x = scale($mci, 1, $scalesize, 0, 1);
+            ## Sample gain value from breakpoint function
+            $gain = samplebpf($gainbpf, $x);
+            ## Use ezsampler to trigger the note with specified parameters
+            ezsampler(@pitch $mc @duration $unit * $overlap).transcribe(
+                @onset $t + $offset
+                @pan rand() 
+                @gain $gain
+            );
+            ## Increment onset offset for next note
+            $offset += $unit
+        ) 
+    );
+    ## Rotate scale for variation across repetitions
+    $scale = dx2x(
+        x2dx($scale).rot($rep), $scale:1
+    );
+    ## Increment global time counter based on sequence length
+    $t += ($scalesize + $rep) * $unit
+);
+## Render the final audio output
+render(@play 1);
+## Export the rendered audio to a file
+export('./section3.wav');
+## Write the total duration of the sequence to a text file
+write($t, './section3.txt')

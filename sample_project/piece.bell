@@ -1,0 +1,39 @@
+#( 
+    Step-by-step guide for generating and assembling sections
+    1. Run each script separately to generate individual audio sections:
+        - Execute section1.bell -> outputs section1.wav and section1.txt
+        - Execute section2.bell -> outputs section2.wav and section2.txt
+        - Execute section3.bell -> outputs section3.wav and section3.txt
+        - Execute section4.bell -> outputs section4.wav and section4.txt
+    2. After running all sections, execute this script to assemble them into a final piece. 
+)#
+## Define the sequence of sections to be assembled
+$files = 'section1' 'section2' 'section1' 'section3' 'section1' 'section4';
+## Initialize global time counter
+$t = 0;
+## Iterate through section files and assemble them
+for $file in $files do (
+    ## Add extra silence before section4
+    if $file == 'section4' then $t += 1000;
+    ## Read timing marker from the respective text file
+    $marker = read('./' + $file + '.txt');
+    ## Import the corresponding audio file
+    $buffer = importaudio('./' + $file + '.wav');
+    ## Add a marker in the transcription
+    addmarker($t, $file);
+    ## Transcribe the section into the final sequence
+    $buffer.transcribe($t);
+    ## Update the global time counter
+    $t += $marker
+);
+## Render the final assembled audio with processing effects
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+);
+## Export the final assembled piece
+export('./piece.wav')

@@ -1,0 +1,61 @@
+## Define the musical scale (C major with Bb instead of B)
+$scale = sort(
+    c4 d4 e4 f4 g4 a4 bb4 
+);
+## Determine the scale size (number of notes in the scale)
+$scalesize = length($scale);
+## Define a melodic pattern as scale degrees
+$pattern = -7 -3 0 2 1 2;
+## Define the rhythm pattern (in beat units)
+$rhythm = 0 0 2 1 1 2;
+## Define transposition shifts for the pattern
+$shifts = 0 1 0 -1;
+## Set the unit duration for beats (in milliseconds)
+$unit = 150;
+## Number of repetitions per shift
+$reps = 2;
+## Initialize the global time counter
+$t = 0;
+## Overlap factor for sustained notes
+$overlap = 4;
+## Iterate over each shift, repeating it as specified
+for $shift in $shifts :* $reps do (
+    ## Adjust the pattern according to the shift value
+    $currentpattern = $pattern + $shift;
+    ## wrap pattern via modular arithmetic to fit scale size
+    $scaledegrees = mod($currentpattern, $scalesize) + 1;
+    ## Compute octave transpositions in MIDI cents to adjust wrapped scale degrees
+    $octaves = floor($currentpattern / $scalesize) * 1200;
+    ## extract corresponding pitches from scale and apply octave shift compensation
+    $melody = $scale:[$scaledegrees] + $octaves;
+    ## Randomize the panning position
+    $pan = rand();
+    ## Iterate over melody notes and corresponding rhythm values
+    for $mc in $melody, $beat in $rhythm do (
+        ## Compute time increment per note
+        $incr = $beat * $unit;
+        ## Compute note duration, ensuring a minimum length (non-zero)
+        $dur = max(1, $beat) * $unit * $overlap;
+        ## Create three transpositions of the note (octave layering)
+        for $i in 0...3 do (
+            ## Define time offset
+            $offset = $i * $unit * 2;
+            ## Compute amplitude scaling factor
+            $amp = 1 - $i / 4;
+            ## Use ezsampler to generate buffer with specified parameters
+            ezsampler(@pitch $mc + $i * 1200 @duration $dur).transcribe(
+                @onset $t + $offset
+                @gain [0 $amp 0] [1 0 -0.125] 
+                @pan $pan
+            ) 
+        );
+        ## Update the global time counter
+        $t += $incr
+    ) 
+);
+## Render the final output
+render(@play 1);
+## Export the rendered audio to a file
+export('./section1.wav');
+## Write the total duration of the sequence to a text file
+write($t, './section1.txt')

@@ -1,0 +1,43 @@
+## Define a chord structure spanning multiple octaves
+$chord = c3 c4 g4 c5 e5 d6 a6 c7;
+## Initialize global time counter
+$t = 0;
+## Set duration for sustained notes (in milliseconds)
+$dur = 4000;
+## Loop through repetition cycles
+for $i in 1...4 do (
+    ## Iterate over chord tones
+    for $mc in $chord do (
+        ## Initialize onset offset
+        $offset = 0;
+        ## Randomly determine number of echo repetitions
+        $echoes = random(7, 15);
+        ## Generate echoing effect for each note
+        for $j in 1...$echoes do (
+            ## Scale gain value for each echo iteration
+            $gain = scale($j, 1, $echoes, 1, 0.125, -0.25);
+            ## Apply detuning incrementally over echoes
+            $det = ($j - 1) * 3;
+            ## Randomize panning for spatial distribution
+            $pan = rand();
+            ## Use ezsampler to trigger the note with specified parameters
+            ezsampler(@pitch $mc - $det @duration $dur).transcribe(
+                @onset $t + $offset
+                @gain [0 $gain 0] [1 0 -0.25] 
+                @pan $pan
+            );
+            ## Increment onset offset for next echo
+            $offset += rand(200) * $i
+        );
+        ## Increment time counter for next chord note
+        $t += rand(50) * $i
+    );
+    ## Increment time counter for next repetition cycle
+    $t += $dur
+);
+## Render the final audio output
+render(@play 1);
+## Export the rendered audio to a file
+export('./section4.wav');
+## Write the total duration of the sequence to a text file
+write($t, './section4.txt')
