@@ -1,10 +1,11 @@
 #( 
-    Step-by-step guide for generating and assembling sections
-    1. Run each script separately to generate individual audio sections:
-        - Execute section1.bell -> outputs section1.wav and section1.txt
-        - Execute section2.bell -> outputs section2.wav and section2.txt
-        - Execute section3.bell -> outputs section3.wav and section3.txt
-        - Execute section4.bell -> outputs section4.wav and section4.txt
+    READ THIS FIRST!
+    Before running this script, you need to do the following:
+    1. Run the following scripts to generate separate files for each:
+        - Run section1.bell -> outputs section1.wav and section1.txt files
+        - Run section2.bell -> outputs section2.wav and section2.txt files
+        - Run section3.bell -> outputs section3.wav and section3.txt files
+        - Run section4.bell -> outputs section4.wav and section4.txt files
     2. After running all sections, execute this script to assemble them into a final piece. 
 )#
 ## Define the sequence of sections to be assembled
