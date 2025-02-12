@@ -1,0 +1,4 @@
+for $mc $mci in dx2x((400 100) :* 12) % 1200 + 6000 do (
+    ezsampler($mc).transcribe(($mci - 1) * 150) 
+);
+render(@play 1)

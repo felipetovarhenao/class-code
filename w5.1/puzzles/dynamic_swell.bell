@@ -1,0 +1,8 @@
+$swellbpf = [0 0 0] [0.5 1 0] [1 0 0];
+$totdur = 5000;
+$n = 30;
+for $x in arithmser(0, 1, null, $n) do (
+    $g = samplebpf($swellbpf, $x);
+    ezsampler().transcribe(@onset $x * $totdur @gain $g) 
+);
+render(@play 1)

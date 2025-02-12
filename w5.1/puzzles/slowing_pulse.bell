@@ -1,0 +1,9 @@
+$unit = 125;
+$onset = 0;
+for $i in 1...4 do (
+    for $j in 1...4 do (
+        ezsampler().transcribe($onset);
+        $onset += $unit * $i
+    ) 
+);
+render(@play 1)

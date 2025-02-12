@@ -1,5 +1,5 @@
 scoreconfig(
-    @voicenames 'voice1' 'voice2' "paul's cat" @clefs 'G' 'F' 'E' 
+    @voicenames 'voice1' 'voice2' "paul's cat" @play 1 'F' 'E' 
 );
 ezsampler().transcribe(@voice 2 @pan 0);
 ezsampler().transcribe(

@@ -1,5 +1,5 @@
 scoreconfig(
-    @clefs 'g' 'g' @voicenames for $i in 1...2 collect ['voice' $i] 
+    @play 1 'g' @voicenames for $i in 1...2 collect ['voice' $i] 
 );
 for $mc $i in (c5 e5 g5) :* 6 do (
     ezsampler($mc).transcribe(
