@@ -1,0 +1,33 @@
+## l-system axiom (starting point)
+$axiom = 'A';
+## l-system rules
+$rules = (
+    ## input (A) -> output (A B)
+    [
+        'A' 'A' 'B' 
+    ] 
+    ## input -> (B) output (A)
+    ['B' 'A'] 
+);
+## number of generations
+$numgen = 5;
+## initialize output sequence
+$output = $axiom;
+$t = 0;
+for $n in 1...$numgen do (
+    ## letter to sound
+    for $letter in $output do (
+        $pitch = if $letter == 'A' then 6000 else 6700;
+        ezsampler($pitch).transcribe($t);
+        $t += 150
+    );
+    $t += 300;
+    print('current $output:' $output);
+    $output = for $letter in $output collect (
+        print($letter '->' $rules.$letter);
+        ## get letter replacement
+        $rules.$letter
+    ) 
+);
+print('final $output:' $output);
+render(@play 1)

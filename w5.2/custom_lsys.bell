@@ -1,0 +1,42 @@
+$rules = (
+    [
+        'A' 'C' 'B' 
+    ] 
+    ## 
+    [
+        'B' 'C' 'A' 
+    ] 
+    ## 
+    [
+        'C' 'B' 'A' 
+    ] 
+);
+$numgens = 7;
+$axiom = 'A';
+$outseq = null;
+$mapping = (
+    ['A' 2] ['B' -1] ['C' -1] 
+);
+$scale = c5 d5 e5 f5 g5 a5 b5;
+$size = length($scale);
+$i = 0;
+$t = 0;
+$outseq = $axiom;
+for $n in 1...$numgens do (
+    $outseq = for $x in $outseq collect (
+        $step = $mapping.$x;
+        $i += $step;
+        $addr = mod($i, $size) + 1;
+        $oct = floor($i / $size) * 1200;
+        $pitch = $scale:$addr + $oct;
+        ezsampler($pitch @duration 1400).transcribe(
+            @onset $t
+            @pan rand() 
+            @gain [0 1 0] [1 0 -0.5] 
+        );
+        $t += 150;
+        $rules.$x
+    );
+    $t += 150
+);
+render(@play 1)

@@ -1,0 +1,12 @@
+$names = (
+    ['yi' 1]
+    ['mutien' 2 3]
+    ['paul' 4 5 6]
+    ['jingyu' 'hi!']
+);
+$rules = (
+    ['A' 'A' 'B']
+    ['B' 'A']
+);
+## <llll>.<key>
+print($rules.'B')
