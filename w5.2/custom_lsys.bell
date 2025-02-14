@@ -12,10 +12,10 @@ $rules = (
     ] 
 );
 $numgens = 7;
-$axiom = 'A';
+$axiom = 'C';
 $outseq = null;
 $mapping = (
-    ['A' 2] ['B' -1] ['C' -1] 
+    ['A' 3] ['B' -2] ['C' -1] 
 );
 $scale = c5 d5 e5 f5 g5 a5 b5;
 $size = length($scale);
