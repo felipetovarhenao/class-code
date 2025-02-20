@@ -1,0 +1,26 @@
+#(
+    Simple Markov Chain Text Generation
+
+    This script:
+    1. Defines a sequence of characters (`'H' 'E' 'L' 'L' 'O'`).
+    2. Builds a Markov transition matrix from the character sequence.
+    3. Generates a new sequence using the Markov model.
+    4. Prints the generated sequence.
+
+    The resulting output is a probabilistic text sequence based on the input pattern.
+)#
+## Step 1: Define input character sequence
+$data = 'H' 'E' 'L' 'L' 'O';
+## Step 2: Build a Markov transition matrix from the character sequence
+$matrix = buildmarkov($data);
+## Step 3: Generate a new sequence using the Markov model
+$output = runmarkov(
+    ## Use the generated Markov transition matrix
+    @matrix $matrix
+    ## Reset if no valid transitions exist
+    @autoclear 1
+    ## Limit the sequence length to 10 characters
+    @maxlength 10
+);
+## Step 4: Print the generated sequence
+print($output)

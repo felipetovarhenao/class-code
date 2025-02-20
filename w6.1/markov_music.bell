@@ -1,0 +1,38 @@
+#(
+    MIDI Pitch-Based Markov Chain Generation
+
+    This script:
+    1. Imports a MIDI file and extracts all pitch values.
+    2. Constructs a third-order Markov transition matrix using pitch sequences.
+    3. Generates a new sequence of pitch values using the Markov model.
+    4. Synthesizes and transcribes the generated pitches using `ezsampler()`.
+    5. Renders the synthesized sequence.
+
+    The resulting output is a melody generated based on the pitch transitions found in the input MIDI file.
+)#
+## Step 1: Import a MIDI file and extract musical events
+$events = importmidi('../markov/allemande.mid');
+## Step 2: Extract all pitch values from MIDI events into a list
+$pitches = for $e in $events collect $e.getkey('pitch');
+## Step 3: Build a third-order Markov transition matrix from the pitch sequence
+$matrix = buildmarkov($pitches @order 2);
+## Step 4: Generate a new sequence of pitches using the Markov model
+$output = runmarkov(
+    ## Use the generated Markov transition matrix
+    @matrix $matrix
+    ## Limit the sequence length to 100 pitches
+    @maxlength 100
+    ## Reset if no valid transitions exist
+    @autoclear 1
+);
+## Step 5: Synthesize and transcribe the generated sequence
+$t = 0;
+## Initialize onset time
+for $pitch in $output do (
+    ## Use `ezsampler()` to synthesize each pitch
+    ezsampler($pitch).transcribe($t);
+    ## Increment onset time to space out notes
+    $t += 150
+);
+## Step 6: Render the synthesized sequence
+render(@play 1)

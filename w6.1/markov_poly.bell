@@ -1,0 +1,72 @@
+#(
+    MIDI Markov Chain Generation
+
+    This script:
+    1. Imports a MIDI file and extracts its events.
+    2. Creates overlapping pairs of adjacent events.
+    3. Converts each event pair into pitch and time distance values.
+    4. Constructs a nth-order Markov transition matrix from these values.
+    5. Generates a new sequence using the Markov model.
+    6. Uses the generated sequence to synthesize and render new music.
+
+    The result is a synthesized musical sequence based on the statistical structure of the input MIDI file.
+)#
+## Step 1: Import a MIDI file and extract musical events
+$events = importmidi('../markov/turkish-march.mid');
+## Step 2: Create overlapping pairs of adjacent events
+$eventpairs = group(
+    $events @modulos 2 @overlap 1
+);
+## Step 3: Convert event pairs into pitch and time distance values
+$data = for $pair in $eventpairs collect (
+    ## Remove outer brackets from grouped pairs
+    $pair = $pair::1;
+    ## First and second events in the pair
+    $left = $pair:1;
+    $right = $pair:2;
+    ## Extract pitch of the first event
+    $pitch1 = $left.getkey('pitch');
+    ## Extract onset times of both events
+    $onset1 = $left.getkey('onset');
+    $onset2 = $right.getkey('onset');
+    ## Calculate the time distance from the first to the second event
+    $distance = $onset2 - $onset1;
+    ## Extract the duration of the first event
+    $duration1 = $left.getkey('duration');
+    ## Store pitch, distance, and duration in a list
+    [$pitch1 $distance $duration1] 
+);
+## Step 4: Build a Markov transition matrix with order 1
+$matrix = buildmarkov(@data $data @order 1);
+## Step 5: Generate a new sequence using the Markov model
+$output = runmarkov(
+    @matrix $matrix
+    ## Limit sequence length to 300 events
+    @maxlength 300
+    ## Use the first data entry as the starting state [null: choose start randomly]
+    @start $data:1
+    ## Enable seeded randomness for reproducibility? [1: yes; 0: no]
+    @useseed 0
+    ## Reset if no valid transitions exist? [1: yes; 0: no]
+    @autoclear 0
+);
+## Step 6: Synthesize and transcribe the generated sequence
+$onset = 0;
+## Initialize onset time
+$mindur = 100;
+## Minimum note duration
+for $note in $output do (
+    ## Flatten nested lists (if any)
+    $note = flat($note);
+    ## Extract pitch, distance, and duration values
+    $pitch = $note:1;
+    $distance = $note:2;
+    $duration = max($mindur, $note:3);
+    ## Ensure duration is at least $mindur
+    ## Generate synthesized sound using ezsampler and transcribe it
+    ezsampler(@pitch $pitch @duration $duration).transcribe($onset);
+    ## Update onset for the next note
+    $onset += $distance
+);
+## Step 7: Render the synthesized sequence
+render(@play 1)

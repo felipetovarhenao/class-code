@@ -1,0 +1,32 @@
+#(
+    MIDI File Playback using ezsampler
+
+    This script:
+    1. Imports a MIDI file and extracts note events.
+    2. Iterates through each event to retrieve pitch, onset time, velocity, and duration.
+    3. Uses `ezsampler()` to synthesize and transcribe the extracted notes.
+    4. Normalizes velocity values to a gain factor (0 to 1).
+    5. Renders the synthesized sequence for playback.
+
+    The result is a synthesized performance of the original MIDI file.
+)#
+## Step 1: Import a MIDI file and extract musical events
+$events = importmidi('../markov/allemande.mid');
+## Step 2: Process each MIDI event
+for $event in $events do (
+    ## Extract pitch, onset, velocity, and duration from the event
+    $pitch = $event.getkey('pitch');
+    $onset = $event.getkey('onset');
+    $velocity = $event.getkey('velocity');
+    $duration = $event.getkey('duration');
+    ## Step 3: Synthesize and transcribe the note using ezsampler
+    ezsampler(
+        @pitch $pitch @duration $duration
+    ).transcribe(
+        @onset $onset
+        ## Normalize velocity (MIDI range 0-127) to a gain factor (0.0-1.0)
+        @gain $velocity / 127.
+    ) 
+);
+## Step 4: Render the synthesized sequence
+render(@play 1)
