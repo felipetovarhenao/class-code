@@ -1,0 +1,156 @@
+#( 
+    buildmarkov
+    Constructs a Markov chain from a given sequence of data.
+
+    Arguments:
+    - @data: The input sequence from which the Markov model will be built.
+    - @order (default = 1): The order of the Markov chain, determining the length of history considered for state transitions.
+    - @prepad (default = '^'): A padding symbol used at the beginning of the sequence to handle initial states.
+    - @postpad (default = '$'): A padding symbol used at the end of the sequence to handle final states.
+
+    Returns:
+    - A classified llll structure mapping state transitions to their occurrence counts.
+
+    Description:
+    This function generates a Markov chain representation from the given sequence.
+    It first ensures that the order is non-negative, then constructs overlapping
+    subsequences of the given order, including padding for initial and final states.
+    The resulting subsequences are classified and mapped to transition counts.
+)#
+buildmarkov = (
+    $data, $order = 1, $prepad = '^', $postpad = '$' -> (
+        ## Ensure order is at least 0 (negative orders are meaningless)
+        $order = max(0, $order);
+        ## Group the sequence into overlapping n-grams (of length $order + 1), with padding at both ends to handle boundary cases.
+        group(
+            @llll (
+                ## Prepend padding symbols for initial states
+                $prepad :* $order
+                ## The original data sequence
+                $data
+                ## Append padding symbols for final states
+                $postpad :* $order
+            ) 
+            ## Define n-gram size (order + 1)
+            @modulos $order + 1
+            ## Ensure overlapping subsequences
+            @overlap $order
+        ).classify().map(
+            ## Map each classified group into a transition count pair
+            $x -> (
+                ## Extract the transition (state sequence)
+                $transition = $x::(1 1);
+                ## Count occurrences of this transition
+                $count = length($x::1);
+                ## Store the transition and its frequency
+                [$transition $count] 
+            ) 
+        ) 
+    ) 
+);
+#(
+    runmarkov
+    Generates a sequence using a given Markov transition matrix.
+
+    Arguments:
+    - @matrix: The Markov transition matrix, where each entry contains an observed sequence and its occurrence count.
+    - @maxlength (default = 25): The maximum length of the generated sequence.
+    - @start (default = null): The initial state for the sequence. If null, a random state is chosen.
+    - @autoclear (default = 1): Determines whether the sequence should automatically reset when no valid transitions exist.
+        - 1: If no valid transitions exist, a new random state is chosen.
+        - 0: If no valid transitions exist, the sequence stops.
+    - @useseed (default = 0): Specifies whether to use a seeded random function for deterministic output.
+        - 1: Uses a seeded choice function (`xchoose`).
+        - 0: Uses a standard random choice function (`choose`).
+    - @prepad (default = '^'): The symbol representing the beginning of a sequence.
+    - @postpad (default = '$'): The symbol representing the end of a sequence.
+
+    Returns:
+    - A generated sequence of elements based on the given Markov transition matrix.
+
+    Description:
+    This function simulates a Markov process by generating a sequence using the provided transition matrix.
+    If a starting state is specified, the function attempts to find transitions from it. Otherwise, it selects
+    a random state from the transition matrix. The function supports both 0th-order Markov chains (where each
+    state is chosen independently with a probability distribution) and higher-order Markov chains (where state
+    transitions depend on previous elements). If the sequence reaches the maximum length or no valid transitions
+    are available, generation stops.
+)#
+runmarkov = (
+    $matrix, $maxlength = 25, $start = null, $autoclear = 1, $useseed = 0, $prepad = '^', $postpad = '$' -> (
+        ## Initialize random choice function (deterministic if $useseed == 1)
+        $choose = if $useseed == 1 then xchoose else choose;
+        ## Infer order of the Markov transition matrix
+        $order = $matrix::1.length() - 2;
+        ## Check if an initial state is provided and order > 0
+        if $start != null && $order > 0 then (
+            ## Find all transitions where the initial state matches the most recent prediction
+            $transitions = finditems(
+                @llll $matrix
+                @items $start
+                @maxdepth 1
+                ## Lambda function to find matching transitions
+                @function ($a, $b -^ $order -> $a:(1 $order) == $b) 
+            ).flat(@level 1);
+            ## Choose a random transition from the found transitions, if valid
+            $current = $choose($transitions)::1.left(-2) 
+        );
+        ## If no valid initial state is found, pick a random starting point from the matrix
+        if $current == null then (
+            $current = $choose($matrix)::1.left(-2) 
+        );
+        ## Proceed only if a transition matrix is available
+        $matrix &&& if $current == null then (
+            ## 0th order Markov process (each state chosen independently)
+            ## Transpose the matrix to extract states and their probabilities
+            $matrix = $matrix.trans();
+            $states = $matrix::1;
+            $weights = $matrix::2;
+            ## Initialize output sequence
+            $seq = $start;
+            ## Adjust maximum length to account for the initial state
+            $maxlength -= length($seq);
+            ## Perform weighted random sampling to generate sequence
+            $seq _= $choose(
+                @choices $states
+                @n $maxlength
+                @weights $weights
+            ) 
+        ) else (
+            ## Higher-order Markov process (states depend on previous context)
+            $stop = 0;
+            ## Initialize output sequence while ensuring padding is excluded
+            $seq = diff($start ||| $current:-1, $prepad $postpad);
+            ## If no valid transition, handle based on autoclear setting
+            while $stop == 0 do (
+                ## If no valid transition, handle based on autoclear setting
+                if $current == null then (
+                    if $autoclear == 1 then (
+                        $current = $choose($matrix)::1.left(-2) 
+                    ) else ($stop = 1) 
+                ) else (
+                    ## Find all possible transitions for the current state
+                    $transitions = $matrix.map($x -^ $current -> if $x::1.left(-2) == $current then $x);
+                    ## If no transitions exist, reset current state
+                    if $transitions == null then $current = null else (
+                        ## Transpose transitions to separate choices and weights
+                        $transitions = $transitions.trans();
+                        ## Extract transition probabilities
+                        $weights = $transitions::-1;
+                        $choices = $transitions::-2;
+                        ## Choose the next transition based on probabilities
+                        $choice = $choose(@choices $choices @weights $weights);
+                        ## Update current state for the next iteration
+                        $current = $current.right(1) $choice;
+                        ## Append the chosen state to the sequence unless it is a padding symbol
+                        if $choice != $prepad && $choice != $postpad then ($seq _= $choice) else if $autoclear == 0 then ($stop = 1) 
+                    ) 
+                );
+                ## Stop when maximum sequence length is reached
+                if length($seq) >= $maxlength then ($stop = 1) 
+            ) 
+        );
+        ## Return the generated sequence
+        $seq
+    ) 
+)
