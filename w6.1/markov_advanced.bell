@@ -1,0 +1,102 @@
+#(
+    Music generation via Order-boosted Markov Feedback
+
+    This script:
+    1. Loads or builds a 1st-order Markov transition matrix from an input MIDI file.
+    2. If a precomputed matrix exists, it reads it from disk; otherwise, it extracts pitch and onset intervals from the MIDI data and constructs the matrix.
+    3. Iteratively increases (i.e., boosts) the Markov order, feeding the output sequence of the previous matrix as input data for a new markov model.
+    4. Generates a musical sequence using the feedback-based Markov model.
+    5. Synthesizes and transcribes the generated sequence using `ezsampler()`.
+    6. Applies audio processing (`normalize` and `freeverb`) and renders the final output.
+
+    The result is a musical sequence that better balances the trade-off between novelty and coherence of traditional markov models.
+)#
+## Step 1: Set random seed for reproducibility
+setseed(3);
+## Step 2: Define input MIDI file and extract its name
+$midifile = '../markov/entertainer.mid';
+$name = parsepath($midifile).getkey('name');
+## Step 3: Define Markov order and output file for storing transition matrix
+$order = 1;
+$matrixfile = './' + $name + '_order-' + tosymbol($order) + '.txt';
+## Step 4: Load or create Markov transition matrix
+$matrix = if exists($matrixfile) == 1 then (
+    ## Load precomputed matrix from file
+    read($matrixfile) 
+) else (
+    ## Import MIDI data and extract pitch and onset interval pairs
+    $data = importmidi($midifile);
+    $data = for $x in group($data, 2, 1) with @unwrap 1 collect (
+        $a = $x:1;
+        $b = $x:2;
+        $state = [
+            ## Extract pitch from first event
+            getkey($a, 'pitch') 
+            ## Compute onset interval
+            getkey($b, 'onset') - getkey($a, 'onset') 
+        ];
+        ## Round and convert to integers to improve generalization
+        int(round($state)) 
+    );
+    ## Build a first-order Markov transition matrix
+    $m = buildmarkov(@data $data @order $order);
+    ## Save matrix to file for future use
+    $m.write($matrixfile);
+    ## Return the computed matrix
+    $m
+);
+## Step 5: Define number of Markov feedback iterations
+## Number of progressive orders
+$N = 5;
+$orders = (1...$N) + $order;
+$maxorder = maximum($orders);
+## Length of sequence for intermediate orders
+$innerlength = 250;
+## Length of final sequence
+$outerlength = 500;
+## Step 6: Generate sequences with progressively increasing Markov order
+for $i in $orders do (
+    ## Check if this is the final iteration
+    $islast = $i >= $maxorder;
+    ## Set sequence length
+    $len = if $islast == 1 then $outerlength else $innerlength;
+    ## Generate sequence using the current Markov model
+    $seq = runmarkov(
+        @matrix $matrix
+        @maxlength $len
+        @useseed 1
+    );
+    ## If not the last iteration, update the Markov model with the new sequence
+    if $islast == 0 then $matrix = buildmarkov(@data $seq @order $i) 
+);
+## Step 7: Synthesize and transcribe the generated sequence
+$t = 0;
+## Initialize onset time
+for $e in $seq with @unwrap 1 do (
+    ## Extract pitch and onset increment from generated event
+    $pitch = $e:1;
+    $incr = $e:2;
+    ## Ensure a minimum note duration
+    $dur = max($incr, 1000);
+    ## Use `ezsampler()` to synthesize and transcribe each note
+    ezsampler(
+        @pitch $pitch @duration $dur
+    ).transcribe(
+        @onset $t * 1.333
+        ## Apply timing adjustment
+        @gain [0 1 0] [1 0 0.1] 
+        ## Apply gain envelope
+        
+    );
+    ## Update onset time for the next note
+    $t += $incr
+);
+## Step 8: Render the synthesized sequence with audio processing
+render(
+    @play 1 @process normalize(-3) freeverb(
+        @roomsize 0.9
+        @wet 0.025
+        @damp 1
+        @width 1
+    ) 
+)
