@@ -1,0 +1,13 @@
+## import some audio file
+$b = importaudio('poem.wav');
+print($b);
+## lazy modification of duration to half a second
+$b = $b.setkey('duration', 500);
+## transcribe buffer with current information
+$b.transcribe();
+## modify information again
+$b = $b.setkey('duration', 2000);
+## transcribe with new information
+$b.transcribe(@onset 2000);
+## render
+render(@play 1)

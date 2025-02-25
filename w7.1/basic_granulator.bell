@@ -1,0 +1,44 @@
+## import trumpet sound
+$snd = importaudio('singing.wav');
+print($snd);
+## initialize onset variable
+$t = 0;
+## set total output duration
+$totdur = 6000;
+## generate grain until total duration is reached
+while $t < $totdur do (
+    ## define grain parameters
+    $graindur = rand(50, 200);
+    ## random panning value
+    $pan = rand(0, 1);
+    ## maximum possible offset value (file duration - grain duration)
+    $maxoffset = $snd.getkey('source_end') - $graindur;
+    ## random grain offset value
+    $grainoffset = rand(0, $maxoffset);
+    ## copy original sound into grain variable and modify its duration
+    $grain = $snd.setkey('duration', $graindur);
+    ## modify grain offset
+    $grain = $grain.setkey('offset', $grainoffset);
+    ## transcribe grain
+    $env = choose(
+        [[0 1 0] [1 0 -0.5] ] 
+        ## 
+        [[0 0 0] [1 1 0.5]] 
+        ## 
+        [
+            [0 0 0] [1 1 -0.25] [2 0 0.25] 
+        ] 
+    ).flat(1);
+    $detune = rand(-1, 1) * 1200;
+    $grain.transcribe(
+        @onset $t
+        @pan $pan
+        @gain $env
+        @detune $detune
+    );
+    ## set increment
+    $incr = rand(5, 100);
+    ## update onset
+    $t += $incr
+);
+render(@play 1)

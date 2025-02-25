@@ -1,0 +1,20 @@
+scoreconfig(
+    @voicenames for $i in 1 2 collect ['voice' $i] @clefs 'g' 'g' 
+);
+$pat = 1 1 1 0 1 1 0 1 0 1 1 0;
+$unit = 150;
+$onset = 0;
+$b = ezsampler(@duration $unit);
+$reps = 4;
+for $v in 1...2 do (
+    $onset = 0;
+    for $i in 0...length($pat) do (
+        for $beat in (if $v > 1 then rot($pat, -$i) else $pat) :* $reps do (
+            if $beat == 1 then $b.transcribe(
+                $onset @voice $v @pan 2 - $v
+            );
+            $onset += $unit
+        ) 
+    ) 
+);
+render(@play 1)

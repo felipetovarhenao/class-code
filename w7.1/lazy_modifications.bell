@@ -1,0 +1,8 @@
+$buf = importaudio('poem.wav');
+print('original duration: ' $buf.getkey('duration'));
+$buf = $buf.setkey('duration', 1000);
+print('modified duration 1:' $buf.getkey('duration'));
+$buf = $buf.setkey('duration', 15000);
+print('modified duration 2:' $buf.getkey('duration'));
+$buf.transcribe();
+render(@play 1)
