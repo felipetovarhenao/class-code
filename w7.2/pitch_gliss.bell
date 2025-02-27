@@ -3,13 +3,15 @@ $input = importaudio('poem.wav');
 ## apply retuning to single pitch
 $input = $input.process(retune(@pitchgrid 0));
 for $v in 0...3 do (
-    ## define resampling amount
-    $resampling = for $i in 1...10 collect choose(-100 -300 -500 0 200 400 500 700 900 1100);
+    ## create list of randomly chosen intervals in cents
+    $resampling = choose(-100 -300 -500 0 200 400 500 700 900 1100 @n 10);
+    ## convert cents to ratios and invert direction
     $resampling = 1/c2r($resampling);
+    ## convert ratios to bpf format for resample processing function
     $resampling = for $y $i in $resampling collect [($i - 1) $y 0.9];
     ## apply resampling to modify pitch and duration at the same time
     $b = $input.process(
-        ## 
+        ## pass resampling bpf/envelope
         resample($resampling) 
     );
     ## transcribe buffer
