@@ -1,0 +1,13 @@
+$fzero = 440;
+$root = f2mc($fzero);
+$harm = f2mc((1...5) * $fzero);
+$t = 0;
+for $dist in arithmser(1, -1., null, 9).print() do (
+    $intervals = x2dx($harm);
+    $chord = dx2x($intervals * $dist, $root);
+    for $mc in $chord do (
+        ezsampler($mc).transcribe($t) 
+    );
+    $t += 500
+);
+render(@play 1)

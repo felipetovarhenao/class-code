@@ -1,0 +1,6 @@
+$b = importaudio('singing.wav');
+$shift = [0 100 0.2] [1 -400 -0.4];
+$fx = freqshift($shift) freeverb() onepole(@cutoff 300);
+$b = $b.process($fx);
+$b.transcribe();
+render(@play 1)

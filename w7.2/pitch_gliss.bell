@@ -1,0 +1,26 @@
+## initialize new buffer
+$input = importaudio('poem.wav');
+## apply retuning to single pitch
+$input = $input.process(retune(@pitchgrid 0));
+for $v in 0...3 do (
+    ## define resampling amount
+    $resampling = for $i in 1...10 collect choose(-100 -300 -500 0 200 400 500 700 900 1100);
+    $resampling = 1/c2r($resampling);
+    $resampling = for $y $i in $resampling collect [($i - 1) $y 0.9];
+    ## apply resampling to modify pitch and duration at the same time
+    $b = $input.process(
+        ## 
+        resample($resampling) 
+    );
+    ## transcribe buffer
+    $b.transcribe(@pan rand()) 
+);
+## render
+render(
+    @play 1 @process freeverb(
+        @roomsize 0.9
+        @wet 0.0125
+        @damp 1
+        @width 1
+    ) 
+)
