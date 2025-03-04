@@ -1,0 +1,16 @@
+## import sound as buffer
+$buf = importaudio('drums.wav');
+## define analysis audio descriptors
+$descr = onsets();
+## analyze and update original buffer
+$buf = $buf.analyze(@descriptors $descr);
+## extract resulting onset analysis 
+$onsets = $buf.getkey('onsets');
+## create a marker for each onset
+for $onset in $onsets do (
+    addmarker(@onset $onset)
+);
+## transcribe buffer
+$buf.transcribe();
+## render
+render(@play 1)

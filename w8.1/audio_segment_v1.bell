@@ -1,0 +1,21 @@
+## import sound as buffer
+$buf = importaudio('singing.wav');
+$keymap = read('./keymap.txt');
+$buf = $buf.analyze(
+    ## 
+    onsets(@alpha 0. @silencethreshold 0.01) 
+);
+$onsets = $buf.getkey('onsets');
+## for $onset in $onsets do (addmarker($onset) );
+$dur = 120;
+for $onset in $onsets do (
+    $seg = $buf.setkey('offset', $onset);
+    $seg = $seg.setkey('duration', $dur);
+    $seg = $seg.analyze(pitchmelodia());
+    $pitch = $seg.getkey('pitchmelodia');
+    ezsampler($pitch @keymap $keymap).transcribe(@onset $onset)
+    ## $seg.transcribe(@onset $onset) 
+);
+render(
+    @play 1 @process normalize(-6) 
+)

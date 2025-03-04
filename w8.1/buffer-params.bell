@@ -1,0 +1,10 @@
+$buf1 = cycle(@duration 3000);
+$buf2 = envelope(
+    [0 0 0] [1 1 0.25] @duration 3000
+);
+$env = gain([0 0 0] [1 1 0.25]);
+$buf1.inspect('cycle');
+$buf2.inspect('envelope');
+$buf1 = $buf1.process($env);
+$buf1.inspect('post process').transcribe();
+render(@play 1)

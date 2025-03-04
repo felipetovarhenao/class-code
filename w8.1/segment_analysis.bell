@@ -1,0 +1,21 @@
+## import sound as a buffer
+$buf = importaudio('drums.wav');
+## perform onset detection analysis and update buffer variable
+$buf = $buf.analyze(onsets());
+## extract resulting onset analysis
+$onsets = $buf.getkey('onsets');
+## iterate through each onset
+$t = 0;
+$incr = 200;
+for $onset in $onsets do (
+    ## create new buffer, using current onset and offset position
+    $seg = $buf.setkey('offset', $onset);
+    ## set duration of segment
+    $seg = $seg.setkey('duration', $incr);
+    ## transcribe segment 
+    $seg.transcribe(
+        $t @gain [0 1 0] [1 0 -0.25]
+    );
+    $t += $incr
+);
+render(@play 1)

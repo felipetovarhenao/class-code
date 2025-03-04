@@ -1,0 +1,18 @@
+$buf = importaudio('singing.wav');
+$buf = $buf.analyze(onsets());
+$onsets = $buf.getkey('onsets');
+$iois = x2dx($onsets $buf.getkey('duration'));
+$keymap = for $onset $i in $onsets, $ioi in $iois collect (
+    $seg = $buf.setkey('offset', $onset).setkey('duration', $ioi);
+    $seg = $seg.analyze(pitchmelodia());
+    $pitch = $seg.getkey('pitchmelodia');
+    if $pitch > 0 then (
+        $seg.transcribe();
+        render(@reset 1);
+        $file = './samples/segment_' + tosymbol($i) + '.wav';
+        export($file);
+        [$pitch $file] 
+    ) 
+);
+
+write($keymap, './keymap.txt')

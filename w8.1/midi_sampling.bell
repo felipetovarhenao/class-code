@@ -1,0 +1,8 @@
+$events = importmidi('bach.mid');
+$keymap = read('./keymap.txt');
+for $event in $events do (
+    $pitch = $event.getkey('pitch');
+    $onset = $event.getkey('onset');
+    ezsampler($pitch @keymap $keymap).transcribe($onset) 
+);
+render(@play 1)

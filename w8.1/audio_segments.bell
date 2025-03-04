@@ -1,0 +1,24 @@
+## import sound as buffer
+$buf = importaudio('singing.wav');
+$buf = $buf.analyze(
+    ## 
+    onsets(@alpha 0. @silencethreshold 0.01) 
+);
+$onsets = $buf.getkey('onsets');
+## for $onset in $onsets do (addmarker($onset) );
+$t = 0;
+$incr = 120;
+for $onset in $onsets do (
+    $seg = $buf.setkey('offset', $onset);
+    $seg = $seg.setkey('duration', $incr);
+    $seg = $seg.analyze(pitchmelodia());
+    $pitch = $seg.getkey('pitchmelodia');
+    $distance = pitchdiff($pitch, 0 4 7);
+    $seg.transcribe(
+        $t @detune $distance @gain [0 1 0] [1 0 -0.25] 
+    );
+    $t += $incr
+);
+render(
+    @play 1 @process normalize(-6) 
+)
