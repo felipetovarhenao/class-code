@@ -1,0 +1,19 @@
+$ser = rev(dx2x(1...3));
+$ser = for $i in 0...2 collect $ser + $i * 4;
+$ser = $ser % 12;
+$onset = 0;
+$unit = 200;
+$gap = $unit * 3;
+for $r in 0 1 do (
+    for $i in 0 1 do (
+        for $j in $ser do (
+            $mc = $j * 100 + 6000;
+            ezsampler($mc @duration $gap).transcribe($onset);
+            $onset += $unit
+        );
+        $onset += $gap;
+        $ser = 12 - $ser
+    );
+    $ser = rev($ser) 
+);
+render(@play 1)
