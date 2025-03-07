@@ -1,0 +1,43 @@
+## Generate a harmonic series based on a fundamental frequency of 3300 mc (MIDI cents)
+$harm = r2mc(1...10, 3300);
+## Initialize onset time
+$t = 0;
+## Transcribe the harmonic series using ezsampler
+for $mc in $harm do (
+    ## Sample and transcribe each harmonic
+    ezsampler($mc).transcribe($t);
+    ## Increment onset time for the next harmonic
+    $t += 120
+);
+## Render and inspect the first transcription
+$b = render(@reset 1);
+$b.inspect('first render');
+## Initialize detune variable for pitch shifting
+$det = 0;
+$t = 0;
+## Apply a detuning effect to the rendered buffer
+for $i in 1...10 do (
+    ## Transcribe with increasing detune amounts
+    $b.transcribe($t @detune $det);
+    ## Increase detune value
+    $det += 400;
+    ## Increment onset time
+    $t += 500
+);
+## Render and inspect the second transcription after detuning
+$b = render(
+    @reset 1 @process normalize(-8)
+);
+$b.inspect('second render');
+## Re-transcribe the buffer multiple times in rapid succession
+$t = 0;
+for $i in 1...80 do (
+    ## Transcribe at small time increments to create dense layering
+    $b.transcribe(@onset $t);
+    ## Small time increment
+    $t += 2.
+);
+## Final rendering with playback and normalization
+render(
+    @play 1 @process normalize(-6) 
+)

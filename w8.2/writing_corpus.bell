@@ -1,0 +1,34 @@
+## Define the list of audio files to be included in the corpus
+$files = (
+    'singing.wav' 'trumpet.wav' 'poem.wav' 
+);
+## Specify the audio descriptor to be used for analysis
+$descr = larm();
+## Build the corpus from the specified audio files
+buildcorpus(
+    ## Provide the list of input files
+    @files $files
+    ## Assign the chosen descriptor (loudness measure)
+    @descriptors $descr
+    ## Segmentation parameters (Control segmentation sensitivity)
+    @alpha 0.1
+    @delay 3
+    @silencethreshold 0.02
+    ## Specify output path for storing the generated corpus
+    @outpath './mycorpus.llll' 
+);
+## Query buffers from the corpus, ordering by loudness measure (larm)
+$bufs = query('SELECT * FROM buffers ORDER BY larm');
+## Initialize onset time
+$onset = 0;
+## Process and transcribe each buffer segment
+for $b $i in $bufs do (
+    ## Apply a windowing function to the buffer
+    $b = $b.process(window());
+    ## Transcribe the buffer with current onset time
+    $b.transcribe($onset);
+    ## Increment onset time by half of the buffer's duration
+    $onset += $b.getkey('duration') * 0.5
+);
+## Render the final sequence and play it back
+render(@play 1)

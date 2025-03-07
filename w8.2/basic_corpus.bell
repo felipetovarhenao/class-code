@@ -1,0 +1,43 @@
+## Specify audio files for corpus analysis
+$files = (
+    'trumpet.wav' 'singing.wav' 
+);
+## Build a corpus from the specified audio files
+## The corpus is analyzed using the following descriptors:
+## - `larm()`: Loudness measure
+## - `pitchmelodia()`: Melodic pitch extraction
+## - `zerocrossingrate()`: A metric correlated with 'percussiveness'
+buildcorpus(
+    @files $files @descriptors larm() pitchmelodia() zerocrossingrate() 
+);
+## SQL queries are used to filter and sort segments based on descriptors
+$sqlqueries = (
+    ## 1: Retrieves all buffers without filtering
+    'SELECT * FROM buffers' 
+    ## 2: Selects sounds with pitch class == 0
+    'SELECT * FROM buffers WHERE pitchmelodia > 0 AND ROUND(pitchmelodia / 100) % 12 == 0' 
+    ## 3: Orders by zero-crossing rate
+    'SELECT * FROM buffers WHERE pitchmelodia > 0 ORDER BY zerocrossingrate' 
+    ## 4: Orders by pitchclass
+    'SELECT * FROM buffers WHERE pitchmelodia > 0 ORDER BY pitchmelodia % 1200' 
+    ## 5: Orders by pitch
+    'SELECT * FROM buffers WHERE pitchmelodia > 0 ORDER BY pitchmelodia' 
+    ## 6: Orders by confidence in pitch estimation
+    'SELECT * FROM buffers ORDER BY pitchmelodia_confidence DESC' 
+);
+## Retrieve buffer segments from the corpus based on SQL query
+$sql = $sqlqueries:4;
+$buffers = query($sql);
+## Initialize onset time for transcription
+$t = 0;
+## Iterate over all selected buffer segments and transcribe them
+for $buf in $buffers do (
+    ## Transcribe the buffer with onset and pitch adjustments
+    $buf.transcribe(
+        @onset $t @pitchkey 'pitchmelodia' 
+    );
+    ## Update onset time by adding the duration of the current buffer
+    $t += $buf.getkey('duration') 
+);
+## Render the transcribed sequence and play it back
+render(@play 1)
